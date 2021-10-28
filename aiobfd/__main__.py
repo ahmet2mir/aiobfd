@@ -9,14 +9,43 @@ import aiobfd
 
 _LOG_LEVELS = ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]
 
+import logging
+import logging.config
+import logging.handlers
+
+logging.config.dictConfig(
+    {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "simple": {
+                "()": "logging.Formatter",
+                "format": "[%(asctime)s] [%(process)d] [%(levelname)s] [%(name)s.%(module)s.%(funcName)s:%(lineno)d] %(message)s",
+                "datefmt": "%Y-%m-%d %H:%M:%S %z",
+            }
+        },
+        "handlers": {
+            "console": {
+                "level": os.environ.get("AIOBFD_LOGLEVEL", "INFO").upper(),
+                "class": "logging.StreamHandler",
+                "formatter": "simple",
+            }
+        },
+        "loggers": {
+            "aiobfd": {
+                "level": os.environ.get("AIOBFD_LOGLEVEL", "INFO").upper(),
+                "handlers": ["console"],
+            },
+        },
+    }
+)
+
 
 def parse_arguments():
     """Parse the user arguments"""
     parser = argparse.ArgumentParser(
         description="Maintain a BFD session with a remote system"
     )
-    parser.add_argument("local", help="Local IP address or hostname")
-    parser.add_argument("remote", help="Remote IP address or hostname")
     family_group = parser.add_mutually_exclusive_group()
     family_group.add_argument(
         "-4",
@@ -35,6 +64,22 @@ def parse_arguments():
         default=socket.AF_UNSPEC,
         const=socket.AF_INET6,
         help="Force IPv6 connectivity",
+    )
+
+    parser.add_argument(
+        "--remote",
+        action="append",
+        help="<Required> remote IP address or hostname",
+        required=True,
+    )
+    parser.add_argument(
+        "--local", type=str, help="Local IP address or hostname"
+    )
+    parser.add_argument(
+        "--control-port",
+        type=int,
+        default=4784,
+        help="Default control port, use 3784 for singlehop",
     )
     parser.add_argument(
         "-r",
@@ -59,68 +104,15 @@ def parse_arguments():
         action="store_true",
         help="Take a passive role in session initialization",
     )
-    parser.add_argument(
-        "-l",
-        "--log-level",
-        default="WARNING",
-        help="Logging level",
-        choices=_LOG_LEVELS,
-    )
-    parser.add_argument(
-        "-o",
-        "--no-log-to-stdout",
-        action="store_true",
-        help="Disable logging to stdout; will be ignored if no"
-        " other logging is selected.",
-    )
-    parser.add_argument(
-        "-f",
-        "--log-to-file",
-        action="store_true",
-        help="Enable logging to a file on the filesystem",
-    )
-    parser.add_argument(
-        "-n",
-        "--log-file",
-        default="/var/log/aiobfd.log",
-        help="Path on filesystem to log to, if enabled",
-    )
-    parser.add_argument(
-        "-s",
-        "--log-to-syslog",
-        action="store_true",
-        help="Enable logging to a syslog handler",
-    )
-    parser.add_argument(
-        "-y",
-        "--log-sock",
-        default="/dev/log",
-        help="Syslog socket to log to, if enabled",
-    )
     return parser.parse_args()
 
 
 def main():
     """Run aiobfd"""
     args = parse_arguments()
-    handlers = []
-
-    if (args.log_to_file or args.log_to_syslog) and not args.no_log_to_stdout:
-        handlers.append(logging.StreamHandler(sys.stdout))
-    if args.log_to_file:
-        handlers.append(logging.handlers.WatchedFileHandler(args.log_file))
-    if args.log_to_syslog:
-        handlers.append(logging.handlers.SysLogHandler(args.log_sock))
-
-    log_format = "%(asctime)s %(name)-12s %(levelname)-8s %(message)s"
-    logging.basicConfig(
-        handlers=handlers,
-        format=log_format,
-        level=logging.getLevelName(args.log_level),
-    )
     control = aiobfd.Control(
         args.local,
-        [args.remote],
+        args.remote,
         family=args.family,
         passive=args.passive,
         rx_interval=args.rx_interval * 1000,
