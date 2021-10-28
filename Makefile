@@ -46,3 +46,6 @@ package-rpm: binary
         --description "Asynchronous BFD Daemon" \
 		--rpm-user root \
 		.
+
+clean:
+	git clean -fdx
