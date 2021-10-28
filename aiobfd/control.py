@@ -10,8 +10,6 @@ from .packet import Packet
 
 log = logging.getLogger(__name__)  # pylint: disable=I0011,C0103
 
-CONTROL_PORT = 3784
-
 
 class Control:
     """BFD Control"""
@@ -25,6 +23,7 @@ class Control:
         tx_interval=1000000,
         rx_interval=1000000,
         detect_mult=3,
+        control_port=4784,
         loop=asyncio.get_event_loop(),
     ):
         self.loop = loop
@@ -43,14 +42,15 @@ class Control:
                     tx_interval=tx_interval,
                     rx_interval=rx_interval,
                     detect_mult=detect_mult,
+                    control_port=control_port,
                 )
             )
 
         # Initialize server
-        log.debug("Setting up UDP server on %s:%s.", local, CONTROL_PORT)
+        log.debug("Setting up UDP server on %s:%s.", local, control_port)
         task = self.loop.create_datagram_endpoint(
             lambda: Server(self.rx_queue),
-            local_addr=(local, CONTROL_PORT),
+            local_addr=(local, control_port),
             family=family,
         )
         self.server, _ = self.loop.run_until_complete(task)

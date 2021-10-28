@@ -16,7 +16,6 @@ log = logging.getLogger(__name__)  # pylint: disable=I0011,C0103
 
 SOURCE_PORT_MIN = 49152
 SOURCE_PORT_MAX = 65535
-CONTROL_PORT = 3784
 
 VERSION = 1
 
@@ -59,6 +58,7 @@ class Session:
         tx_interval=1000000,
         rx_interval=1000000,
         detect_mult=3,
+        control_port=4784,
     ):
         # Argument variables
         self.local = local
@@ -68,6 +68,7 @@ class Session:
         self.loop = asyncio.get_event_loop()
         self.rx_interval = rx_interval  # User selectable value
         self.tx_interval = tx_interval  # User selectable value
+        self.control_port = control_port
 
         # As per 6.8.1. State Variables
         self.state = STATE_DOWN
@@ -98,7 +99,7 @@ class Session:
         self._tx_packets = None
 
         # Create the local client and run it once to grab a port
-        log.debug("Setting up UDP client for %s:%s.", remote, CONTROL_PORT)
+        log.debug("Setting up UDP client for %s:%s.", remote, self.control_port)
         src_port = random.randint(SOURCE_PORT_MIN, SOURCE_PORT_MAX)
         fam, _, _, _, addr = socket.getaddrinfo(self.local, src_port)[0]
         sock = socket.socket(family=fam, type=socket.SOCK_DGRAM)
@@ -114,7 +115,7 @@ class Session:
         log.info(
             "Sourcing traffic for %s:%s from %s:%s.",
             remote,
-            CONTROL_PORT,
+            self.control_port,
             self.client.get_extra_info("sockname")[0],
             self.client.get_extra_info("sockname")[1],
         )
@@ -334,9 +335,11 @@ class Session:
 
     def tx_packet(self, final=False):
         """Transmit a single BFD packet to the remote peer"""
-        log.debug("Transmitting BFD packet to %s:%s", self.remote, CONTROL_PORT)
+        log.debug(
+            "Transmitting BFD packet to %s:%s", self.remote, self.control_port
+        )
         self.client.sendto(
-            self.encode_packet(final), (self.remote, CONTROL_PORT)
+            self.encode_packet(final), (self.remote, self.control_port)
         )
 
     async def async_tx_packets(self):
