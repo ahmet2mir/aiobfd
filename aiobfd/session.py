@@ -449,34 +449,34 @@ class Session:
                 self.local_diag = DIAG_NEIGHBOR_SIGNAL_DOWN
                 self.state = STATE_DOWN
                 self.desired_min_tx_interval = DESIRED_MIN_TX_INTERVAL
-                log.error(
+                log.info(
                     "BFD remote %s signaled going ADMIN_DOWN.", self.remote
                 )
         else:
             if self.state == STATE_DOWN:
                 if packet.state == STATE_DOWN:
                     self.state = STATE_INIT
-                    log.error(
+                    log.info(
                         "BFD session with %s going to INIT state.", self.remote
                     )
                 elif packet.state == STATE_INIT:
                     self.state = STATE_UP
                     self.desired_min_tx_interval = self.tx_interval
-                    log.error(
+                    log.info(
                         "BFD session with %s going to UP state.", self.remote
                     )
             elif self.state == STATE_INIT:
                 if packet.state in (STATE_INIT, STATE_UP):
                     self.state = STATE_UP
                     self.desired_min_tx_interval = self.tx_interval
-                    log.error(
+                    log.info(
                         "BFD session with %s going to UP state.", self.remote
                     )
             else:
                 if packet.state == STATE_DOWN:
                     self.local_diag = DIAG_NEIGHBOR_SIGNAL_DOWN
                     self.state = STATE_DOWN
-                    log.error("BFD remote %s signaled going DOWN.", self.remote)
+                    log.info("BFD remote %s signaled going DOWN.", self.remote)
 
         # If a BFD Control packet is received with the Poll (P) bit set to 1,
         # the receiving system MUST transmit a BFD Control packet with the Poll
