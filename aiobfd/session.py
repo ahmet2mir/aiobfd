@@ -476,7 +476,9 @@ class Session:
                 if packet.state == STATE_DOWN:
                     self.local_diag = DIAG_NEIGHBOR_SIGNAL_DOWN
                     self.state = STATE_DOWN
-                    log.critical("BFD remote %s signaled going DOWN.", self.remote)
+                    log.critical(
+                        "BFD remote %s signaled going DOWN.", self.remote
+                    )
 
         # If a BFD Control packet is received with the Poll (P) bit set to 1,
         # the receiving system MUST transmit a BFD Control packet with the Poll

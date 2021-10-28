@@ -28,14 +28,18 @@ fmt:
 
 build:
 	@echo "Building aiobfd"
-	@poetry build -f wheel
+	poetry build -f wheel
 
 binary: build
-	poetry run pyinstaller --runtime-tmpdir /var/lib/aiobfd --distpath dist/usr/bin --clean --onefile --name aiobfd aiobfd/__main__.py
+	@echo "Building binary"
+	poetry run pyinstaller --runtime-tmpdir /run/aiobfd --distpath dist/usr/bin --clean --onefile --name aiobfd aiobfd/__main__.py
 	rm -f dist/*.whl
 
 package-rpm: binary
-	mkdir -p dist/var/lib/aiobfd
+	@echo "Building RPM"
+	cp -r package/usr/lib dist/usr/
+	cp -r package/etc dist/
+	cp -r package/var dist/
 	cd dist; fpm \
 		--input-type dir \
 		--output-type rpm \
@@ -44,7 +48,17 @@ package-rpm: binary
 		--prefix / \
 		--name aiobfd \
         --description "Asynchronous BFD Daemon" \
-		--rpm-user root \
+		--before-install var/lib/scripts/build-before-install.sh \
+		--after-install var/lib/scripts/build-after-install.sh \
+		--after-remove var/lib/scripts/build-after-remove.sh \
+		--after-upgrade var/lib/scripts/build-after-update.sh \
+		--rpm-user aiobfd \
+		--rpm-group aiobfd \
+		--rpm-attr "750,aiobfd,aiobfd:/etc/aiobfd" \
+		--rpm-attr "750,aiobfd,aiobfd:/etc/aiobfd/aiobfd.conf.sample" \
+		--rpm-attr "750,aiobfd,aiobfd:/var/lib/aiobfd" \
+		--rpm-attr "755,aiobfd,aiobfd:/usr/bin/aiobfd" \
+		--rpm-attr "755,root,root:/usr/lib/systemd/system/aiobfd.service" \
 		.
 
 clean:
