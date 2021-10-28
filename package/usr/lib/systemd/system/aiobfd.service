@@ -1,0 +1,13 @@
+[Unit]
+Description=AIO BFD
+After=network.target
+ConditionPathExists=/etc/aiobfd/aiobfd.conf
+
+[Service]
+EnvironmentFile=/etc/aiobfd/aiobfd.conf
+RuntimeDirectory=aiobfd
+User=aiobfd
+ExecStart=/usr/bin/aiobfd $AIOBFD_ARGS
+
+[Install]
+WantedBy=multi-user.target
