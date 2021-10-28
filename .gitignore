@@ -1,3 +1,7 @@
+#### joe made this: http://goel.io/joe
+
+#####=== Python ===#####
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -6,10 +10,12 @@ __pycache__/
 *.so
 
 # Distribution / packaging
-bin/
+.Python
+env/
 build/
 develop-eggs/
 dist/
+downloads/
 eggs/
 lib/
 lib64/
@@ -20,16 +26,52 @@ var/
 .installed.cfg
 *.egg
 
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
 
 # Unit test / coverage reports
+htmlcov/
 .tox/
 .coverage
 .cache
 nosetests.xml
 coverage.xml
 
-# IDEs
-.vscode/
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Not Joe
+
+.sass-cache/
+ignore/
+.venv
+trash/
+result.json
+.DS_Store
+.vscode
+pip-wheel-metadata/
+# wildq/_wildq_version.py
+.idea
+*.swp
+Pipfile.lock
+artifacts/
+dev.py
+upx/
+init

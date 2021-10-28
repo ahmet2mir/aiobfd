@@ -1,0 +1,72 @@
+[tool.poetry]
+name = "aiobfd"
+version = "0.2.0"
+description = "Asynchronous BFD Daemon."
+authors = ["Kris Lambrechts <kris@netedge.plus>"]
+license = "MIT"
+keywords = [
+    "BFD",
+    "Bidirectional",
+    "Forwarding",
+    "Detection",
+    "rfc5880",
+]
+classifiers = [
+    'Development Status :: 3 - Alpha',
+    'Framework :: AsyncIO',
+    'Intended Audience :: Telecommunications Industry',
+    'Topic :: System :: Networking :: Monitoring :: Hardware Watchdog',
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: 3.5',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+]
+readme = "README.md"
+documentation = "https://github.com/netedgeplus/aiobfd"
+homepage = "https://github.com/netedgeplus/aiobfd"
+repository = "https://github.com/netedgeplus/aiobfd.git"
+
+
+[tool.poetry.scripts]
+aiobfd = 'aiobfd.__main__:main'
+
+[tool.poetry.dependencies]
+python = ">=3.6.2,<4.0"
+bitstring = "^3.1.9"
+
+[tool.poetry.dev-dependencies]
+pyinstaller = "^4.0"
+black = "^21.9b0"
+bandit = "^1.7.0"
+coverage = "^6.0.2"
+flake8 = "^4.0.1"
+flake8-bugbear = "^21.9.2"
+isort = "^5.9.3"
+
+[tool.black]
+line-length = 80
+target-version = ['py36', 'py37', 'py38']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | tests/data
+)/
+'''
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
