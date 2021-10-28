@@ -6,13 +6,13 @@ import pytest
 import aiobfd.transport
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def client():
     """Create an aoibfd client"""
     return aiobfd.transport.Client()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def server():
     """Create an aoibfd server"""
     rx_queue = asyncio.Queue()
@@ -26,19 +26,23 @@ def test_client_connection_made(client):
 
 def test_client_datagram_received(client, mocker):
     """Test whether receiving packets on a client port creates a log entry"""
-    mocker.patch('aiobfd.transport.log')
-    client.datagram_received('data', ('127.0.0.1', 12345))
+    mocker.patch("aiobfd.transport.log")
+    client.datagram_received("data", ("127.0.0.1", 12345))
     aiobfd.transport.log.info.assert_called_once_with(
-        'Unexpectedly received a packet on a BFD source port from %s on port '
-        '%d', '127.0.0.1', 12345)
+        "Unexpectedly received a packet on a BFD source port from %s on port "
+        "%d",
+        "127.0.0.1",
+        12345,
+    )
 
 
 def test_client_error_received(client, mocker):
     """Test whether receiving errors on a client creates a log entry"""
-    mocker.patch('aiobfd.transport.log')
-    client.error_received('test error')
+    mocker.patch("aiobfd.transport.log")
+    client.error_received("test error")
     aiobfd.transport.log.error.assert_called_once_with(
-        'Socket error received: %s', 'test error')
+        "Socket error received: %s", "test error"
+    )
 
 
 def test_server_connection_made(server):
@@ -48,12 +52,13 @@ def test_server_connection_made(server):
 
 def test_server_datagram_received(server):
     """Test whether receiving packets on the server queues them"""
-    server.datagram_received('data', ('127.0.0.1', 12345))
+    server.datagram_received("data", ("127.0.0.1", 12345))
 
 
 def test_server_error_received(server, mocker):
     """Test whether receiving errors on a server creates a log entry"""
-    mocker.patch('aiobfd.transport.log')
-    server.error_received('test error')
+    mocker.patch("aiobfd.transport.log")
+    server.error_received("test error")
     aiobfd.transport.log.error.assert_called_once_with(
-        'Socket error received: %s', 'test error')
+        "Socket error received: %s", "test error"
+    )
