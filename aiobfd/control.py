@@ -1,6 +1,6 @@
 """aiobfd: BFD Control process"""
 # pylint: disable=I0011,R0913
-
+import os
 import asyncio
 import logging
 import socket
@@ -24,6 +24,7 @@ class Control:
         rx_interval=1000000,
         detect_mult=3,
         control_port=4784,
+        state_dir=None,
         loop=asyncio.get_event_loop(),
     ):
         self.loop = loop
@@ -43,6 +44,7 @@ class Control:
                     rx_interval=rx_interval,
                     detect_mult=detect_mult,
                     control_port=control_port,
+                    state_dir=state_dir,
                 )
             )
 
@@ -136,3 +138,49 @@ class Control:
                 self.loop.run_forever()  # pragma: no cover
         finally:
             self.loop.close()
+
+    @staticmethod
+    def check(
+        local,
+        remotes,
+        state_dir=None,
+    ):
+        for remote in remotes:
+            if not os.path.exists(
+                f"{state_dir}/local-session-{local}-{remote}.state"
+            ):
+                print(
+                    f"CRITICAL: {state_dir}/local-session-{local}-{remote}.state doesn't exists"
+                )
+                return False
+
+            if not os.path.exists(
+                f"{state_dir}/remote-session-{local}-{remote}.state"
+            ):
+                print(
+                    f"CRITICAL: {state_dir}/remote-session-{local}-{remote}.state doesn't exists"
+                )
+                return False
+
+            with open(
+                f"{state_dir}/local-session-{local}-{remote}.state", "r"
+            ) as fd:
+                status = int(fd.read())
+                if status != 3:
+                    print(
+                        f"CRITICAL: local {local}-{remote} is not up, getting status {status} instead of 3"
+                    )
+                    return False
+
+            with open(
+                f"{state_dir}/remote-session-{local}-{remote}.state", "r"
+            ) as fd:
+                status = int(fd.read())
+                if status != 3:
+                    print(
+                        f"CRITICAL: remote {local}-{remote} is not up, getting status {status} instead of 3"
+                    )
+                    return False
+
+        print("OK: aiobfd is running and all session are up")
+        return True

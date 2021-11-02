@@ -59,6 +59,7 @@ class Session:
         rx_interval=1000000,
         detect_mult=3,
         control_port=4784,
+        state_dir=None,
     ):
         # Argument variables
         self.local = local
@@ -69,10 +70,15 @@ class Session:
         self.rx_interval = rx_interval  # User selectable value
         self.tx_interval = tx_interval  # User selectable value
         self.control_port = control_port
+        self.state_dir = state_dir
 
         # As per 6.8.1. State Variables
+        self._state = STATE_DOWN
+        self._remote_state = STATE_DOWN
+        # to persist states
         self.state = STATE_DOWN
         self.remote_state = STATE_DOWN
+
         self.local_discr = random.randint(0, 4294967295)  # 32-bit value
         self.remote_discr = 0
         self.local_diag = DIAG_NONE
@@ -123,6 +129,34 @@ class Session:
         # Schedule the coroutines to transmit packets and detect failures
         self._tx_packets = asyncio.ensure_future(self.async_tx_packets())
         asyncio.ensure_future(self.detect_async_failure())
+
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, value):
+        self._state = value
+        if self.state_dir:
+            with open(
+                f"{self.state_dir}/local-session-{self.local}-{self.remote}.state",
+                "w",
+            ) as fd:
+                fd.write(str(self.state))
+
+    @property
+    def remote_state(self):
+        return self._remote_state
+
+    @remote_state.setter
+    def remote_state(self, value):
+        self._remote_state = value
+        if self.state_dir:
+            with open(
+                f"{self.state_dir}/remote-session-{self.local}-{self.remote}.state",
+                "w",
+            ) as fd:
+                fd.write(str(self.remote_state))
 
     # The transmit interval MUST be recalculated whenever
     # bfd.DesiredMinTxInterval changes, or whenever bfd.RemoteMinRxInterval
