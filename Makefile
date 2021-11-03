@@ -1,12 +1,12 @@
 PYTHON_CMD ?= python
 PIP_CMD ?= pip
-AIOBFD_VERSION ?= "0.2"
 EL_PACKAGE_ITERATION ?= 1.el
 EL_VERSION_ID ?= 7
 
 init_pip:
 	@echo "Target init_pip"
 	$(PIP_CMD) show -q poetry || $(PIP_CMD) install poetry
+	$(PIP_CMD) show -q poetry-dynamic-versioning || $(PIP_CMD) install poetry-dynamic-versioning
 	poetry install
 	poetry version --no-ansi
 	poetry update --dry-run
@@ -17,6 +17,7 @@ init_pipx:
 	$(PIP_CMD) show -q pipx || $(PIP_CMD) install pipx
 	$(PYTHON_CMD) -m pipx ensurepath
 	pipx runpip poetry show -q poetry || pipx install poetry
+	pipx runpip poetry show -q poetry-dynamic-versioning || pipx inject poetry poetry-dynamic-versioning
 	poetry install
 	poetry version --no-ansi
 	poetry update --dry-run
@@ -43,7 +44,7 @@ package-rpm: binary
 	cd dist; fpm \
 		--input-type dir \
 		--output-type rpm \
-		--version $(AIOBFD_VERSION) \
+		--version $(shell poetry version --no-ansi --short) \
 		--iteration $(EL_PACKAGE_ITERATION)$(EL_VERSION_ID) \
 		--prefix / \
 		--name aiobfd \

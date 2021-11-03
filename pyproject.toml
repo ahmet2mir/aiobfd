@@ -1,6 +1,26 @@
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+format-jinja = """
+    {%- if distance == 0 -%}
+        {{ serialize_pep440(base) }}
+    {%- elif revision is not none -%}
+        {{ serialize_pep440(base, stage, revision + 1, dev=distance, metadata=[commit]) }}
+    {%- else -%}
+        {{ serialize_pep440(bump_version(base), stage, revision, dev=distance, metadata=[commit]) }}
+    {%- endif -%}
+"""
+[tool.poetry-dynamic-versioning.substitution]
+files = ["aiobfd/_aiobfd_version.py"]
+
+
 [tool.poetry]
 name = "aiobfd"
-version = "1.2.2"
+version = "0.0.0" # managed by poetry-dynamic-versioning
 description = "Asynchronous BFD Daemon."
 authors = ["Kris Lambrechts <kris@netedge.plus>"]
 license = "MIT"
@@ -65,8 +85,3 @@ exclude = '''
   | tests/data
 )/
 '''
-
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
