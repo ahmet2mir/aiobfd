@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiobfd"
-version = "1.2.0"
+version = "1.2.2"
 description = "Asynchronous BFD Daemon."
 authors = ["Kris Lambrechts <kris@netedge.plus>"]
 license = "MIT"
