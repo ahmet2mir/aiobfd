@@ -7,7 +7,7 @@ ConditionPathExists=/etc/aiobfd/aiobfd.conf
 EnvironmentFile=/etc/aiobfd/aiobfd.conf
 RuntimeDirectory=aiobfd
 User=aiobfd
-ExecStart=/usr/bin/aiobfd $AIOBFD_ARGS
+ExecStart=/usr/bin/aiobfd run $AIOBFD_ARGS
 
 [Install]
 WantedBy=multi-user.target
