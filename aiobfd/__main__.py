@@ -113,7 +113,7 @@ def get_parser():
         )
         prs.add_argument(
             "--state-dir",
-            default="/run/aiobfd",
+            default="/tmp",
             help="Directory where to persist state on filesystem.",
         )
 
