@@ -1,1 +1,4 @@
+# set a tmpdir without noexec mount option
+TMPDIR="/run/aiobfd"
+
 AIOBFD_ARGS="-4 --local 127.0.0.1 --remote 127.1.0.1 --remote 127.2.0.1 --rx-interval 45 --tx-interval 45 --detect-mult 3 --control-port 4784"
