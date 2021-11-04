@@ -33,7 +33,7 @@ binary: build
 	@echo "Building binary"
 	mkdir -p artifacts/binaries
 	cp README.md LICENSE artifacts/binaries
-	poetry run pyinstaller --runtime-tmpdir /run/aiobfd --distpath artifacts/binaries --clean --onefile --name aiobfd aiobfd/__main__.py
+	poetry run pyinstaller --distpath artifacts/binaries --clean --onefile --name aiobfd aiobfd/__main__.py
 
 archive-linux: binary
 	@echo "Target archive-linux"
