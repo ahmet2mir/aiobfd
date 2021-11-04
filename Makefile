@@ -41,5 +41,35 @@ archive-linux: binary
 	tar cfz artifacts/archives/aiobfd-$(shell poetry version --no-ansi --short)-linux-x86_64.tar.gz -C artifacts/binaries aiobfd README.md LICENSE
 	sha256sum artifacts/archives/aiobfd-$(shell poetry version --no-ansi --short)-linux-x86_64.tar.gz >> artifacts/checksums.txt
 
+package-rpm: binary
+	@echo "Target package-rpm"
+	mkdir -p artifacts/rpm
+	mkdir -p artifacts/rpm/usr/bin
+	cp artifacts/binaries/aiobfd artifacts/rpm/usr/bin/
+	cp -r package/usr/lib artifacts/rpm/usr
+	cp -r package/etc artifacts/rpm/
+	cp -r package/var artifacts/rpm/
+	cd artifacts/rpm; fpm \
+		--input-type dir \
+		--output-type rpm \
+		--version $(shell poetry version --no-ansi --short) \
+		--iteration "1" \
+		--prefix / \
+		--name aiobfd \
+        --description "Asynchronous BFD Daemon" \
+		--before-install var/lib/scripts/build-before-install.sh \
+		--after-install var/lib/scripts/build-after-install.sh \
+		--after-remove var/lib/scripts/build-after-remove.sh \
+		--after-upgrade var/lib/scripts/build-after-update.sh \
+		--rpm-user aiobfd \
+		--rpm-group aiobfd \
+		--rpm-attr "750,aiobfd,aiobfd:/etc/aiobfd" \
+		--rpm-attr "640,aiobfd,aiobfd:/etc/aiobfd/aiobfd.conf.sample" \
+		--rpm-attr "750,aiobfd,aiobfd:/var/lib/aiobfd" \
+		--rpm-attr "755,aiobfd,aiobfd:/usr/bin/aiobfd" \
+		--rpm-attr "644,root,root:/usr/lib/systemd/system/aiobfd.service" \
+		.
+	sha256sum artifacts/rpm/aiobfd-$(shell poetry version --no-ansi --short)-1.x86_64.rpm >> artifacts/checksums.txt
+
 clean:
 	git clean -fdx

@@ -28,12 +28,13 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         uses: ahmet2mir/docker-python@master
         with:
-          make_args: init_pip archive-linux
+          make_args: init_pip archive-linux package-rpm
 
       - name: Upload Release Asset
         uses: ahmet2mir/softprops-action-gh-release@v1
         with:
           files: |
+            ./artifacts/rpm/*.rpm
             ./artifacts/archives/*.tar.gz
             ./artifacts/checksums.txt
         env:
