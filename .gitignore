@@ -72,3 +72,5 @@ artifacts/
 dev.py
 upx/
 init
+init_pip
+init_pipx
