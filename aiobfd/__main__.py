@@ -145,6 +145,7 @@ def main():
             tx_interval=args.tx_interval * 1000,
             detect_mult=args.detect_mult,
             state_dir=args.state_dir,
+            control_port=args.control_port,
         )
         control.run()
     elif args.command == "check":
